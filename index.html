@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Techco Easter Prize Flip</title>
+<style>
+  :root{
+    --brand-green:#0b5a45;
+    --brand-green-dark:#06372b;
+    --brand-gold:#d2b25f;
+    --brand-gold-light:#f3e0a0;
+    --white:#ffffff;
+    --shadow:0 18px 45px rgba(0,0,0,.28);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    color:var(--white);
+    background:
+      linear-gradient(rgba(7,59,46,.58), rgba(7,59,46,.72)),
+      url('background.png') center center / cover no-repeat fixed;
+    min-height:100vh;
+  }
+  .page{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 16px;
+  }
+  .shell{
+    width:min(1120px, 100%);
+    background:rgba(255,255,255,.08);
+    backdrop-filter: blur(10px);
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:28px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .hero{
+    padding:26px 18px 10px;
+    text-align:center;
+  }
+  .logo-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:12px;
+  }
+  .logo{
+    width:min(430px, 90vw);
+    max-width:430px;
+    background:rgba(255,255,255,.96);
+    padding:14px 18px;
+    border-radius:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,.2);
+  }
+  h1{
+    margin:6px 0 8px;
+    font-size:clamp(30px, 5vw, 52px);
+    line-height:1.03;
+  }
+  .subtitle{
+    margin:0 auto;
+    max-width:720px;
+    font-size:clamp(15px, 2vw, 18px);
+    color:rgba(255,255,255,.94);
+  }
+  .content{
+    padding:12px 18px 28px;
+  }
+  .card-panel{
+    margin:20px auto 0;
+    background:rgba(4,31,24,.28);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:24px;
+    padding:24px 18px 28px;
+    max-width:960px;
+  }
+  .gate{
+    max-width:520px;
+    margin:0 auto;
+    text-align:center;
+  }
+  .gate h2{
+    margin:0 0 8px;
+    font-size:28px;
+  }
+  .gate p{
+    margin:0 0 18px;
+    color:rgba(255,255,255,.85);
+  }
+  .fields{
+    display:grid;
+    gap:12px;
+    margin-bottom:14px;
+  }
+  input{
+    width:100%;
+    border:none;
+    border-radius:14px;
+    padding:15px 16px;
+    font-size:16px;
+    outline:none;
+    box-shadow:inset 0 0 0 2px transparent;
+  }
+  input:focus{
+    box-shadow:inset 0 0 0 2px var(--brand-gold);
+  }
+  button{
+    border:none;
+    border-radius:999px;
+    padding:14px 20px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+  }
+  button:hover{ transform:translateY(-1px); }
+  .start-btn{
+    width:100%;
+    background:linear-gradient(135deg, var(--brand-gold-light), var(--brand-gold));
+    color:var(--brand-green-dark);
+    box-shadow:0 10px 24px rgba(0,0,0,.2);
+  }
+  .cards-area{
+    display:none;
+    margin-top:10px;
+  }
+  .cards-grid{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(150px, 1fr));
+    gap:26px;
+    justify-items:center;
+    align-items:center;
+    margin-top:6px;
+  }
+  .card{
+    width:100%;
+    max-width:185px;
+    aspect-ratio:3/4;
+    perspective:1200px;
+    cursor:pointer;
+    transition:opacity .35s ease, transform .35s ease, filter .35s ease;
+  }
+  .card.hidden{
+    opacity:0;
+    pointer-events:none;
+    transform:scale(.88);
+    filter:blur(2px);
+  }
+  .card-inner{
+    position:relative;
+    width:100%;
+    height:100%;
+    transform-style:preserve-3d;
+    transition:transform .8s cubic-bezier(.2,.8,.2,1);
+  }
+  .card.flipped .card-inner{
+    transform:rotateY(180deg);
+  }
+  .card-face{
+    position:absolute;
+    inset:0;
+    border-radius:24px;
+    overflow:hidden;
+    backface-visibility:hidden;
+    box-shadow:var(--shadow);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:16px;
+  }
+  .card-front{
+    background:
+      linear-gradient(rgba(0,0,0,.10), rgba(0,0,0,.10)),
+      linear-gradient(160deg, var(--brand-gold-light), var(--brand-gold));
+    color:var(--brand-green-dark);
+    border:3px solid rgba(255,255,255,.42);
+    flex-direction:column;
+    gap:8px;
+  }
+  .bunny-holder{
+    width:92px;
+    height:110px;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 10px 20px rgba(0,0,0,.16);
+    animation:bunnyBounce 2.2s ease-in-out infinite;
+    transform-origin:center bottom;
+    background:#fff;
+  }
+  .bunny-holder img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  @keyframes bunnyBounce{
+    0%, 100% { transform:translateY(0) scale(1); }
+    25% { transform:translateY(-6px) scale(1.03); }
+    50% { transform:translateY(0) scale(1); }
+    75% { transform:translateY(-3px) scale(1.015); }
+  }
+  .pick-label{
+    font-size:13px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    opacity:.85;
+  }
+  .card-number{
+    font-size:26px;
+    font-weight:800;
+  }
+  .card-back{
+    transform:rotateY(180deg);
+    background:
+      radial-gradient(circle at top, rgba(255,255,255,.15), transparent 45%),
+      linear-gradient(160deg, #149a64, var(--brand-green));
+    border:3px solid rgba(255,255,255,.28);
+    color:var(--white);
+    flex-direction:column;
+    gap:12px;
+  }
+  .won{
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    opacity:.86;
+  }
+  .prize{
+    font-size:28px;
+    font-weight:800;
+    line-height:1.05;
+  }
+  .result{
+    display:none;
+    margin-top:28px;
+    text-align:center;
+  }
+  .result.show{ display:block; }
+  .result h3{
+    margin:0 0 10px;
+    font-size:clamp(24px, 4vw, 34px);
+  }
+  .result p{
+    margin:0 0 18px;
+    color:rgba(255,255,255,.9);
+    font-size:17px;
+  }
+  .claim-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    background:#25D366;
+    color:#08351f;
+    text-decoration:none;
+    padding:14px 22px;
+    border-radius:999px;
+    font-weight:800;
+    box-shadow:0 12px 28px rgba(0,0,0,.25);
+  }
+  .micro{
+    margin-top:18px;
+    font-size:13px;
+    color:rgba(255,255,255,.78);
+    line-height:1.5;
+  }
+  .confetti{
+    position:fixed;
+    top:-14px;
+    width:10px;
+    height:18px;
+    opacity:.95;
+    pointer-events:none;
+    animation:fall linear forwards;
+    z-index:9999;
+  }
+  @keyframes fall{
+    to{
+      transform:translate3d(var(--drift), 108vh, 0) rotate(720deg);
+      opacity:1;
+    }
+  }
+  @media (max-width: 880px){
+    .cards-grid{ grid-template-columns:repeat(2, minmax(130px, 1fr)); }
+  }
+  @media (max-width: 560px){
+    .hero{ padding:22px 16px 8px; }
+    .content{ padding:8px 14px 18px; }
+    .card-panel{ padding:18px 14px 22px; border-radius:20px; }
+    .cards-grid{ gap:18px; }
+    .card{ max-width:160px; }
+    .bunny-holder{ width:78px; height:96px; }
+    .card-number{ font-size:22px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="shell">
+      <div class="hero">
+        <div class="logo-wrap">
+          <img src="techco-logo.png" alt="Techco logo" class="logo">
+        </div>
+        <h1>Pick a Card &amp; Win</h1>
+        <p class="subtitle">Wishing everyone a happy Easter holiday. Choose one card to reveal your Techco Easter prize.</p>
+      </div>
+
+      <div class="content">
+        <div class="card-panel">
+          <div class="gate" id="gate">
+            <h2>Enter to Play</h2>
+            <p>Add your company name and email address before choosing your card.</p>
+            <div class="fields">
+              <input type="text" id="companyName" placeholder="Company Name" />
+              <input type="email" id="emailAddress" placeholder="Email Address" />
+            </div>
+            <button class="start-btn" id="startBtn">Start the Card Flip</button>
+            <div class="micro">One card per participant.</div>
+          </div>
+
+          <div class="cards-area" id="cardsArea">
+            <div class="cards-grid">
+              <div class="card" data-prize="R100 Discount" data-card="1">
+                <div class="card-inner">
+                  <div class="card-face card-front">
+                    <div class="bunny-holder"><img src="bunny-card.png" alt="Bunny"></div>
+                    <div class="pick-label">Pick a Card</div>
+                    <div class="card-number">Card 1</div>
+                  </div>
+                  <div class="card-face card-back">
+                    <div class="won">You won</div>
+                    <div class="prize">R100 Discount</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card" data-prize="R150 Discount" data-card="2">
+                <div class="card-inner">
+                  <div class="card-face card-front">
+                    <div class="bunny-holder"><img src="bunny-card.png" alt="Bunny"></div>
+                    <div class="pick-label">Pick a Card</div>
+                    <div class="card-number">Card 2</div>
+                  </div>
+                  <div class="card-face card-back">
+                    <div class="won">You won</div>
+                    <div class="prize">R150 Discount</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card" data-prize="R50 Discount" data-card="3">
+                <div class="card-inner">
+                  <div class="card-face card-front">
+                    <div class="bunny-holder"><img src="bunny-card.png" alt="Bunny"></div>
+                    <div class="pick-label">Pick a Card</div>
+                    <div class="card-number">Card 3</div>
+                  </div>
+                  <div class="card-face card-back">
+                    <div class="won">You won</div>
+                    <div class="prize">R50 Discount</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card" data-prize="R200 Discount" data-card="4">
+                <div class="card-inner">
+                  <div class="card-face card-front">
+                    <div class="bunny-holder"><img src="bunny-card.png" alt="Bunny"></div>
+                    <div class="pick-label">Pick a Card</div>
+                    <div class="card-number">Card 4</div>
+                  </div>
+                  <div class="card-face card-back">
+                    <div class="won">You won</div>
+                    <div class="prize">R200 Discount</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="result" id="result">
+              <h3 id="resultTitle"></h3>
+              <p id="resultText"></p>
+              <a id="claimLink" class="claim-btn" target="_blank" rel="noopener noreferrer">Claim Prize on WhatsApp</a>
+              <div class="micro">Sales@tpeng.co.za<br>T’s &amp; C’s apply</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const gate = document.getElementById('gate');
+    const cardsArea = document.getElementById('cardsArea');
+    const startBtn = document.getElementById('startBtn');
+    const companyNameInput = document.getElementById('companyName');
+    const emailInput = document.getElementById('emailAddress');
+    const cards = document.querySelectorAll('.card');
+    const result = document.getElementById('result');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultText = document.getElementById('resultText');
+    const claimLink = document.getElementById('claimLink');
+
+    let started = false;
+    let picked = false;
+
+    startBtn.addEventListener('click', () => {
+      const company = companyNameInput.value.trim();
+      const email = emailInput.value.trim();
+
+      if (!company || !email) {
+        alert('Please enter your company name and email address before playing.');
+        return;
+      }
+
+      started = true;
+      gate.style.display = 'none';
+      cardsArea.style.display = 'block';
+    });
+
+    function launchConfetti() {
+      const colors = ['#d2b25f', '#f1df9c', '#25D366', '#0b5a45', '#ffffff'];
+      for (let i = 0; i < 100; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (Math.random() * 1.8 + 2.4) + 's';
+        piece.style.setProperty('--drift', (Math.random() * 180 - 90) + 'px');
+        piece.style.borderRadius = Math.random() > 0.5 ? '999px' : '2px';
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 4500);
+      }
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        if (!started || picked) return;
+
+        picked = true;
+        const prize = card.dataset.prize;
+        const cardNumber = card.dataset.card;
+        const company = companyNameInput.value.trim();
+        const email = emailInput.value.trim();
+
+        card.classList.add('flipped');
+
+        cards.forEach(other => {
+          if (other !== card) {
+            setTimeout(() => other.classList.add('hidden'), 160);
+          }
+        });
+
+        result.classList.add('show');
+        resultTitle.textContent = 'Congratulations!';
+        resultText.textContent = 'You selected Card ' + cardNumber + ' and won ' + prize + '.';
+        const msg = 'Hi, I just played the Techco Easter card game. My company is ' + company + ', my email is ' + email + ', and I won ' + prize + '.';
+        claimLink.href = 'https://wa.me/27615419927?text=' + encodeURIComponent(msg);
+
+        launchConfetti();
+      });
+    });
+  </script>
+</body>
+</html>
